@@ -19,10 +19,15 @@ datum = read.csv(datum)
 datum$date = as.Date(datum$date,"%Y-%m-%d")
 cleandatum = datum[!(is.na(datum$steps)),]
 ```
+
 ###What is mean total number of steps taken per day?
 ```{r}
 sumByDay = aggregate(steps ~ date,cleandatum,sum)
 ```
+```{r echo=FALSE}
+sumByDay
+```
+
 ####1 Make a histogram of the total number of steps taken each day
 ```{r}
 hist(sumByDay$steps)
@@ -31,8 +36,17 @@ hist(sumByDay$steps)
 ####2 Calculate and report the mean and median total number of steps taken per day
 ```{r}
 meanByDay = aggregate(steps ~ date,cleandatum,mean)
+```
+```{r echo=FALSE}
+meanByDay
+```
+```{r}
 medianByDay = aggregate(steps ~ date,cleandatum,median)
 ```
+```{r echo=FALSE}
+medianByDay
+```
+
 ###What is the average daily activity pattern?
 ####1 Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 ```{r}
@@ -41,12 +55,18 @@ plot(meanByDay$date,meanByDay$steps,type="l")
 
 ####2 Which 5-minute interval, on average across all the days in the datumset, contains the maximum number of steps?
 ```{r}
-maxStepsDay = cleandatum[(datum$steps == max(cleandatum$steps)),]
+maxStepsDay = cleandatum[(cleandatum$steps == max(cleandatum$steps)),]
+```
+```{r echo=FALSE}
+maxStepsDay$interval
 ```
 ###Imputing missing values
 ####1 Calculate and report the total number of missing values in the datumset (i.e. the total number of rows with NAs)
 ```{r}
 emptydatum = length(is.na(datum$steps))
+```
+```{r echo=FALSE}
+emptydatum
 ```
 ####2 Devise a strategy for filling in all of the missing values in the datumset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 ```{r}
@@ -59,7 +79,7 @@ getMeanOfDay <- function(date){
   }
 }
 ```
-####3 Create a new datumset that is equal to the original datumset but with the missing datum filled in.
+####3 Create a new dataset that is equal to the original datumset but with the missing datum filled in.
 ```{r}
 datum[(is.na(datum$steps)),]$steps <- unlist(lapply(datum[(is.na(datum$steps)),]$date,getMeanOfDay))
 ```
@@ -67,9 +87,18 @@ datum[(is.na(datum$steps)),]$steps <- unlist(lapply(datum[(is.na(datum$steps)),]
 ```{r}
 sumByDayWithNoNA = aggregate(steps ~ date,datum,sum)
 hist(sumByDayWithNoNA$steps)
-meanByDayWithNoNA = aggregate(steps ~ date,sumByDayWithNoNA,mean)
 medianByDayWithNoNA = aggregate(steps ~ date,sumByDayWithNoNA,median)
 ```
+```{r echo=FALSE}
+medianByDayWithNoNA
+```
+```{r }
+meanByDayWithNoNA = aggregate(steps ~ date,sumByDayWithNoNA,mean)
+```
+```{r echo=FALSE}
+meanByDayWithNoNA
+```
+
 ###Are there differences in activity patterns between weekdays and weekends?
 ####1 Create a new factor variable in the datumset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
 ```{r}
@@ -85,7 +114,6 @@ getWeekdayOrWeekend <- function(date){
 }
 ```
 ####2 Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis).
-####See the README file in the GitHub repository to see an example of what this plot should look like using simulated datum.
 ```{r}
 meanByWeekdei = aggregate(steps ~ date,datum,mean)
 meanByWeekdei$daytype = unlist(lapply(meanByWeekdei$date,getWeekdayOrWeekend))
